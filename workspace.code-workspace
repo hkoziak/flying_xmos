@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"name": "Qtest",
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"cmath": "cpp",
+			"cstdlib": "cpp",
+			"array": "cpp",
+			"string": "cpp"
+		},
+		"git.ignoreLimitWarning": true
+	}
+}
