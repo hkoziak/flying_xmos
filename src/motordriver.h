@@ -66,7 +66,15 @@ void setValues(double p1, double p2, double p3, double p4) // range [0; 100]
     Serial.print((calcMicroseconds(p3) - MinValue) / 10.0);
     Serial.print(",");
     Serial.print((calcMicroseconds(p4) - MinValue) / 10.0);
+    Serial.print("#");
+
+// #GRAVT:100,100,100#
+    Serial.print("#GRAVT:");
+    Serial.print(gravity.x * 100.0);
+    Serial.print(",");
+    Serial.print(gravity.y * 100.0);
+    Serial.print(",");
+    Serial.print(gravity.z * 100.0);
     Serial.println("#");
-// Serial.println();
 #endif
 } 
