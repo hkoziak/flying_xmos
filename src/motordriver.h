@@ -3,10 +3,10 @@
 
 #include "globalvariables.h"
 
-Servo d1;
-Servo d2;
-Servo d3;
-Servo d4;
+Servo driver1;
+Servo driver2;
+Servo driver3;
+Servo driver4;
 
 constexpr double MinValue = 1000;
 constexpr double MamValue = 2000;
@@ -16,17 +16,17 @@ uint64_t LastUpdateEngine = 0;
 
 void setupDriver() 
 { 
-    d1.attach(8);
-    d1.writeMicroseconds(1000);
+    driver1.attach(8);
+    driver1.writeMicroseconds(1000);
     
-    d2.attach(9);
-    d2.writeMicroseconds(1000);
+    driver2.attach(9);
+    driver2.writeMicroseconds(1000);
     
-    d3.attach(10);
-    d3.writeMicroseconds(1000);
+    driver3.attach(10);
+    driver3.writeMicroseconds(1000);
     
-    d4.attach(11);
-    d4.writeMicroseconds(1000);
+    driver4.attach(11);
+    driver4.writeMicroseconds(1000);
 }
 
 double calcMicroseconds(double p)
@@ -36,10 +36,10 @@ double calcMicroseconds(double p)
 
 void setValues(double p1, double p2, double p3, double p4) // range [0; 100]
 {
-    d1.writeMicroseconds(calcMicroseconds(p1));
-    d2.writeMicroseconds(calcMicroseconds(p2));
-    d3.writeMicroseconds(calcMicroseconds(p3));
-    d4.writeMicroseconds(calcMicroseconds(p4));
+    driver1.writeMicroseconds(calcMicroseconds(p1));
+    driver2.writeMicroseconds(calcMicroseconds(p2));
+    driver3.writeMicroseconds(calcMicroseconds(p3));
+    driver4.writeMicroseconds(calcMicroseconds(p4));
 
 #ifdef DEBUG_OUTPUT
     Serial.print(" engines (1 2 3 4): ");
@@ -66,15 +66,39 @@ void setValues(double p1, double p2, double p3, double p4) // range [0; 100]
     Serial.print((calcMicroseconds(p3) - MinValue) / 10.0);
     Serial.print(",");
     Serial.print((calcMicroseconds(p4) - MinValue) / 10.0);
-    Serial.print("#");
-
-// #GRAVT:100,100,100#
-    Serial.print("#GRAVT:");
-    Serial.print(gravity.x * 100.0);
-    Serial.print(",");
-    Serial.print(gravity.y * 100.0);
-    Serial.print(",");
-    Serial.print(gravity.z * 100.0);
     Serial.println("#");
+// Serial.println();
 #endif
+
+#ifdef QUADRO_SERIAL_PLOTTER
+// #ENGP:100,100,100,100,100#
+    // Serial.print(speedRequest);
+    // Serial.print(" ");
+
+    // Serial.print("   (pitchIn, rollIn): ");
+
+    // Serial.print(pitchInput);
+    // Serial.print(" ");
+    Serial.print(rollInput);
+    Serial.print(" ");
+
+    // Serial.print("   (pitchOut, rollOut): ");
+
+    // Serial.print(pitchOutput);
+    // Serial.print(" ");
+    Serial.print(rollOutput);
+    Serial.println(" ");
+
+    // Serial.print("");
+    // Serial.print((calcMicroseconds(p1) - MinValue) / 10.0);
+    // Serial.print("");
+    // Serial.print((calcMicroseconds(p2) - MinValue) / 10.0);
+    // Serial.print("");
+    // Serial.print((calcMicroseconds(p3) - MinValue) / 10.0);
+    // Serial.print("");
+    // Serial.print((calcMicroseconds(p4) - MinValue) / 10.0);
+    // Serial.println("");
+// Serial.println();
+#endif
+
 } 
