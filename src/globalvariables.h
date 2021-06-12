@@ -14,7 +14,7 @@ double pitchInput, rollInput;
 // #define DEBUG_OUTPUT
 
 // #define QUADRO_DRAW_OUTPUT
-// #define QUADRO_SERIAL_PLOTTER
+#define QUADRO_SERIAL_PLOTTER
 
 
 #endif

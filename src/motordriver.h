@@ -72,8 +72,8 @@ void setValues(float p1, float p2, float p3, float p4) // range [0; 100]
 
 #ifdef QUADRO_SERIAL_PLOTTER
 // #ENGP:100,100,100,100,100#
-    // Serial.print(speedRequest);
-    // Serial.print(" ");
+    Serial.print(speedRequest);
+    Serial.print(" ");
 
     // Serial.print("   (pitchIn, rollIn): ");
 
