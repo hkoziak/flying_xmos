@@ -13,7 +13,7 @@ MPU6050 mpu;
 bool blinkState = false;
 
 // MPU control/status vars
-bool dmpReady = false;  // set true if DMP init was successful
+bool dmpReady = false;  // set true if DMP init was successfulfw
 uint8_t mpuIntStatus;   // holds actual interrupt status byte from MPU
 uint8_t devStatus;      // return status after each device operation (0 = success, !0 = error)
 uint16_t packetSize;    // expected DMP packet size (default is 42 bytes)
@@ -21,10 +21,7 @@ uint16_t fifoCount;     // count of all bytes currently in FIFO
 uint8_t fifoBuffer[64]; // FIFO storage buffer
 
 // orientation/motion vars
-Quaternion q;           // [w, x, y, z]         quaternion container
-VectorInt16 aa;         // [x, y, z]            accel sensor measurements
-VectorInt16 aaReal;     // [x, y, z]            gravity-free accel sensor measurements
-VectorInt16 aaWorld;    // [x, y, z]            world-frame accel sensor measurements
+Quaternion quater;           // [w, x, y, z]         quaternion container
 VectorFloat gravity;    // [x, y, z]            gravity vector
 float euler[3];         // [psi, theta, phi]    Euler angle container
 float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
@@ -32,12 +29,8 @@ float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gra
 bool rcCheckStatus = false;
 bool readyToFlyStatus = false;
 
-double pitchOutput, rollOutput;
-double setPitch, setRoll;
-double pitchInput, rollInput;
-
 const double  CoefP = 0.25;
-const double  CoefI = 0.06;
+const double  CoefI = 0.05;
 const double  CoefD = 0.1;
 
 // requested paarameters [0, 100]%
@@ -56,7 +49,7 @@ void dmpDataReady()
 }
 
 uint64_t lastMpuReaded = 0;
-const uint64_t MaxTimeWhaitingForMpuData = 100;
+const uint64_t MaxTimeWaitingForMpuData = 100;
 
 void readRcControllerData();
 bool isShutDownRequested();
@@ -71,8 +64,8 @@ void setup()
     Wire.begin();
     TWBR = 24; // 400kHz I2C clock
 
-    Serial.begin(115200);
-    Serial1.begin(9600);
+    Serial.begin(115200); // Debug
+    Serial1.begin(9600);  // BLT
 
 
 // byte count = 0;
@@ -216,14 +209,14 @@ void loop()
         if (!isAllowedEngineUpdateByPid)
             continue;
 
-        double p1 = speedRequest + (rollOutput / 2) + (pitchOutput / 2);
-        double p2 = speedRequest - (rollOutput / 2) + (pitchOutput / 2);
-        double p3 = speedRequest + (rollOutput / 2) - (pitchOutput / 2);
-        double p4 = speedRequest - (rollOutput / 2) - (pitchOutput / 2);
+        double motor1_upper_left = speedRequest + (rollOutput / 2) + (pitchOutput / 2);
+        double motor2_upper_right = speedRequest - (rollOutput / 2) + (pitchOutput / 2);
+        double motor3_lower_left = speedRequest + (rollOutput / 2) - (pitchOutput / 2);
+        double motor4_lower_right = speedRequest - (rollOutput / 2) - (pitchOutput / 2);
 
         // Serial.println(F("setValues(p1, p2, p3, p4);"));
 
-        setValues(p1, p2, p3, p4);
+        setValues(motor1_upper_left, motor2_upper_right, motor3_lower_left, motor4_lower_right);
     }
 
     mpuInterrupt = false;
@@ -263,9 +256,9 @@ void loop()
         
             fifoCount -= packetSize;
 
-            mpu.dmpGetQuaternion(&q, fifoBuffer);
-            mpu.dmpGetGravity(&gravity, &q);
-            mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+            mpu.dmpGetQuaternion(&quater, fifoBuffer);
+            mpu.dmpGetGravity(&gravity, &quater);
+            mpu.dmpGetYawPitchRoll(ypr, &quater, &gravity);
             pitchInput = (ypr[1] * 180/M_PI);
             rollInput = (ypr[2] * 180/M_PI);
 
@@ -310,7 +303,7 @@ void shutDownQ()
 
 bool isMpuDataActual()
 {
-    if (millis() - lastMpuReaded > MaxTimeWhaitingForMpuData)
+    if (millis() - lastMpuReaded > MaxTimeWaitingForMpuData)
         return false;
     return true;
 }
@@ -329,7 +322,7 @@ bool isShutDownRequested()
     return false;
 }
 
-void whaitData(int data)
+void waitData(int data)
 {
     while (true)
         if(Serial1.available() > 0)
@@ -349,21 +342,21 @@ void readRcControllerData()
                 if (Serial1.read() == 'k')
                 {
                     Serial.println(F("Disconnect engine power, then send 'k'"));
-                    whaitData('k');
+                    waitData('k');
                     setValues(100, 100, 100, 100);
                     Serial.println(F("Connect engine power, wait for signal, then send 'k'"));
-                    whaitData('k');
+                    waitData('k');
                     setValues(0, 0, 0, 0);
                     Serial.println(F("Calibration ended, send 'k'"));
-                    whaitData('k');
+                    waitData('k');
                 }
             break;
             }
         }
 
-        Serial.println(F("Whait 8 then 9 symbols to init RC controller"));
-        whaitData('8');
-        whaitData('9');
+        Serial.println(F("Wait 8 then 9 symbols to init RC controller"));
+        waitData('8');
+        waitData('9');
         rcCheckStatus = true;
         Serial.println(F("RC controller checked"));
     }
@@ -402,4 +395,3 @@ void readRcControllerData()
 
     while (Serial.available() && Serial.read()); // empty buffer
 }
-
