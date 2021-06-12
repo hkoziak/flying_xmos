@@ -56,6 +56,7 @@ bool isShutDownRequested();
 bool isMpuDataActual();
 void shutDownQ();
 void clearControlRequestValues();
+float limit_power(float p);
 
 void setup() 
 {
@@ -209,14 +210,19 @@ void loop()
         if (!isAllowedEngineUpdateByPid)
             continue;
 
-        double motor1_upper_left = speedRequest + (rollOutput / 2) + (pitchOutput / 2);
-        double motor2_upper_right = speedRequest - (rollOutput / 2) + (pitchOutput / 2);
-        double motor3_lower_left = speedRequest + (rollOutput / 2) - (pitchOutput / 2);
-        double motor4_lower_right = speedRequest - (rollOutput / 2) - (pitchOutput / 2);
+        float motor_upper_left = speedRequest + (rollOutput / 2) + (pitchOutput / 2);
+        float motor_upper_right = speedRequest - (rollOutput / 2) + (pitchOutput / 2);
+        float motor_lower_left = speedRequest + (rollOutput / 2) - (pitchOutput / 2);
+        float motor_lower_right = speedRequest - (rollOutput / 2) - (pitchOutput / 2);
+
+        motor_upper_left = limit_power(motor_upper_left);
+        motor_upper_right = limit_power(motor_upper_right);
+        motor_lower_left = limit_power(motor_lower_left);
+        motor_lower_right = limit_power(motor_lower_right);
 
         // Serial.println(F("setValues(p1, p2, p3, p4);"));
 
-        setValues(motor1_upper_left, motor2_upper_right, motor3_lower_left, motor4_lower_right);
+        setValues(motor_upper_left, motor_upper_right, motor_lower_left, motor_lower_right);
     }
 
     mpuInterrupt = false;
@@ -320,6 +326,14 @@ bool isShutDownRequested()
         return true;
 
     return false;
+}
+
+float limit_power(float p)
+{
+    if(p < 0) p = 0;
+    if(p > 100) p = 100;
+
+    return p;
 }
 
 void waitData(int data)

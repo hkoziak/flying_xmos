@@ -8,9 +8,9 @@ Servo driver2;
 Servo driver3;
 Servo driver4;
 
-constexpr double MinValue = 1000;
-constexpr double MamValue = 2000;
-constexpr double DiffValue = MamValue - MinValue;
+constexpr float MinValue = 1000;
+constexpr float MaxValue = 2000;
+constexpr float DiffValue = MaxValue - MinValue;
 
 uint64_t LastUpdateEngine = 0;
 
@@ -29,12 +29,12 @@ void setupDriver()
     driver4.writeMicroseconds(1000);
 }
 
-double calcMicroseconds(double p)
+float calcMicroseconds(float p)
 {
     return MinValue + (DiffValue * (p / 100.0));
 } 
 
-void setValues(double p1, double p2, double p3, double p4) // range [0; 100]
+void setValues(float p1, float p2, float p3, float p4) // range [0; 100]
 {
     driver1.writeMicroseconds(calcMicroseconds(p1));
     driver2.writeMicroseconds(calcMicroseconds(p2));
